@@ -42,7 +42,7 @@ export const sendEmailRecoveryService = async ({
         },
       })
 
-    const link = `${env.BASE_URL}/${user.id}/${token.token}`
+    const link = `${env.BASE_URL}/password/${user.id}/${token.token}`
 
     const arrayUserName = user.name ? user.name.split(' ') : ['']
     const emailName =

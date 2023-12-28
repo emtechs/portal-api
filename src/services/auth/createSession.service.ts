@@ -26,5 +26,5 @@ export const createSessionService = async ({
       401,
     )
 
-  return refreshSessionService(user.id)
+  return refreshSessionService(user)
 }

@@ -10,31 +10,91 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CategoryPeriod {
+  ANO
+  BIMESTRE
+  SEMESTRE
+}
+
 model User {
-  id              String   @id @default(uuid())
-  name            String   @db.VarChar(254)
-  email           String?  @db.VarChar(254)
-  login           String   @unique @db.VarChar(128)
-  password        String   @db.VarChar(128)
-  cpf             String   @unique @db.VarChar(14)
-  is_active       Boolean  @default(true)
-  is_first_access Boolean  @default(true)
-  created_at      DateTime @default(now())
+  id              String       @id @default(uuid())
+  name            String       @db.VarChar(254)
+  email           String?      @db.VarChar(254)
+  login           String       @unique @db.VarChar(128)
+  password        String       @db.VarChar(128)
+  cpf             String       @unique @db.VarChar(14)
+  is_super        Boolean      @default(false)
+  is_worker       Boolean      @default(false)
+  is_active       Boolean      @default(true)
+  is_first_access Boolean      @default(true)
+  created_at      DateTime     @default(now())
   profile         Image?
   token           Token?
+  modules         ModuleUser[]
 
   @@map("users")
 }
 
+model Module {
+  id         String         @id @default(uuid())
+  name       String         @db.VarChar(200)
+  created_at DateTime       @default(now())
+  counties   ModuleCounty[]
+
+  @@map("modules")
+}
+
+model County {
+  id         String         @id @default(uuid())
+  name       String         @db.VarChar(200)
+  created_at DateTime       @default(now())
+  profile    Image?
+  modules    ModuleCounty[]
+
+  @@map("counties")
+}
+
+model Year {
+  id      String   @id @default(uuid())
+  year    String   @unique @db.VarChar(10)
+  periods Period[]
+
+  @@map("years")
+}
+
+model Month {
+  id    String @id @default(uuid())
+  name  String @unique @db.VarChar(30)
+  month Int    @unique @db.Integer
+
+  @@map("months")
+}
+
+model Period {
+  id           String         @id @default(uuid())
+  name         String         @db.VarChar(50)
+  category     CategoryPeriod
+  date_initial DateTime       @db.Date
+  date_final   DateTime       @db.Date
+  year         Year           @relation(fields: [year_id], references: [id], onDelete: Cascade)
+  year_id      String
+
+  @@map("periods")
+}
+
 model Image {
-  id         String   @id @default(uuid())
-  name       String   @db.VarChar(200)
-  size       Int      @db.Integer()
-  url        String   @db.VarChar(200)
-  key        String   @unique @db.VarChar(200)
-  created_at DateTime @default(now())
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  user_id    String   @unique
+  id         String        @id @default(uuid())
+  name       String        @db.VarChar(200)
+  size       Int           @db.Integer()
+  url        String        @db.VarChar(200)
+  key        String        @unique @db.VarChar(200)
+  created_at DateTime      @default(now())
+  user       User?         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String?       @unique
+  county     County?       @relation(fields: [county_id], references: [id], onDelete: Cascade)
+  county_id  String?       @unique
+  module     ModuleCounty? @relation(fields: [module_id], references: [id], onDelete: Cascade)
+  module_id  String?       @unique
 
   @@map("images")
 }
@@ -47,4 +107,28 @@ model Token {
   created_at DateTime @default(now())
 
   @@map("token")
+}
+
+model ModuleCounty {
+  id         String       @id @default(uuid())
+  created_at DateTime     @default(now())
+  module     Module       @relation(fields: [module_id], references: [id], onDelete: Cascade)
+  module_id  String
+  county     County       @relation(fields: [county_id], references: [id], onDelete: Cascade)
+  county_id  String
+  profile    Image?
+  user       ModuleUser[]
+
+  @@map("module_county")
+}
+
+model ModuleUser {
+  id         String       @id @default(uuid())
+  created_at DateTime     @default(now())
+  module     ModuleCounty @relation(fields: [module_id], references: [id], onDelete: Cascade)
+  module_id  String
+  user       User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id    String
+
+  @@map("module_user")
 }

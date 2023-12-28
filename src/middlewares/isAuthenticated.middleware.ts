@@ -21,6 +21,8 @@ export const verifyUserIsAuthenticated = async (
 
     req.user = {
       id: decoded.sub,
+      is_super: decoded.is_super,
+      is_worker: decoded.is_worker,
     }
   })
 

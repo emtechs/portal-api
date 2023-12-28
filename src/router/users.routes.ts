@@ -10,7 +10,8 @@ import {
 } from '../controllers'
 import {
   validateSchemaMiddleware,
-  verifyIsPermission,
+  verifyIsSuper,
+  verifyIsWorker,
   verifyUserIsAuthenticated,
 } from '../middlewares'
 import { UserCreateSchema, UserUpdateRequestSchema } from '../schemas'
@@ -20,10 +21,20 @@ export const userRouter = Router()
 userRouter.post(
   '',
   validateSchemaMiddleware(UserCreateSchema),
+  (req, res, next) => {
+    if (req.headers.authorization)
+      return verifyUserIsAuthenticated(req, res, next)
+    return next()
+  },
   createUserController,
 )
 
-userRouter.get('', verifyUserIsAuthenticated, listUserController)
+userRouter.get(
+  '',
+  verifyUserIsAuthenticated,
+  verifyIsWorker,
+  listUserController,
+)
 
 userRouter.get('/profile', verifyUserIsAuthenticated, profileUserController)
 
@@ -38,7 +49,6 @@ userRouter.get('/:id', verifyUserIsAuthenticated, retrieveUserController)
 userRouter.patch(
   '/:id',
   verifyUserIsAuthenticated,
-  verifyIsPermission,
   validateSchemaMiddleware(UserUpdateRequestSchema),
   updateUserController,
 )
@@ -46,6 +56,6 @@ userRouter.patch(
 userRouter.delete(
   '/:id',
   verifyUserIsAuthenticated,
-  verifyIsPermission,
+  verifyIsSuper,
   deleteUserController,
 )

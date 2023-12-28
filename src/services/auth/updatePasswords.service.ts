@@ -12,16 +12,16 @@ export const updatePasswordService = async (
   token: string,
 ) => {
   const userFind = await prisma.user.findUnique({ where: { id } })
-  if (!userFind) throw new AppError('Invalid link or expired', 400)
+  if (!userFind) throw new AppError('Invalid link or expired')
 
   const tokenFind = await prisma.token.findFirst({
     where: { token },
   })
   if (!tokenFind || tokenFind.user_id !== id)
-    throw new AppError('Invalid link or expired', 400)
+    throw new AppError('Invalid link or expired')
 
   jwt.verify(token, env.SECRET_KEY, (error) => {
-    if (error) throw new AppError(error.message, 400)
+    if (error) throw new AppError(error.message)
   })
 
   password = hashSync(password, 10)

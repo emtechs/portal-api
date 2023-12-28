@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
 import { AppError } from '../errors'
 
-export const verifyIsPermission = async (
+export const verifyIsSuper = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  if (req.query.is_permission) return next()
+  if (req.user.is_super) return next()
 
   throw new AppError('Missing permissions', 401)
 }

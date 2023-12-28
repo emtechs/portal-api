@@ -14,7 +14,7 @@ export const createSessionController = async (req: Request, res: Response) => {
 }
 
 export const refreshSessionController = (req: Request, res: Response) => {
-  const token = refreshSessionService(req.user.id)
+  const token = refreshSessionService(req.user)
 
   return res.status(201).json(token)
 }

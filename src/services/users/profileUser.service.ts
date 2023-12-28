@@ -8,6 +8,8 @@ export const profileUserService = async ({ id }: IRequestUser) => {
       id: true,
       name: true,
       email: true,
+      is_super: true,
+      is_worker: true,
       is_first_access: true,
       profile: { select: { url: true } },
     },

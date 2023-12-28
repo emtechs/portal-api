@@ -3,8 +3,10 @@ import { z } from 'zod'
 export const UserCreateSchema = z.object({
   login: z.string(),
   name: z.string(),
-  password: z.string(),
+  password: z.string().optional(),
   cpf: z.string(),
+  is_super: z.boolean().optional(),
+  is_worker: z.boolean().optional(),
 })
 
 export const UserReturnSchema = UserCreateSchema.extend({
@@ -13,7 +15,6 @@ export const UserReturnSchema = UserCreateSchema.extend({
   created_at: z.date(),
   is_active: z.boolean(),
   is_first_access: z.boolean(),
-
   profile: z.object({ url: z.string().url() }).nullable().optional(),
 }).omit({ password: true })
 
